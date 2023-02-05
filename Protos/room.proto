@@ -1,0 +1,31 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "userMessages.proto";
+import "roomMessages.proto";
+
+option csharp_namespace = "ContentRate.Protos";
+package room;
+
+ service RoomService{
+     rpc CreateRoom(roomMessages.RoomUpdateGrpc) returns (google.protobuf.Empty);
+     rpc DeleteRoom(roomMessages.RoomDeleteGrpc) returns (google.protobuf.Empty);
+     rpc UpdateRoom(roomMessages.RoomUpdateGrpc) returns (google.protobuf.Empty);
+     rpc JoinRoom(roomMessages.RoomEnterGrpc) returns (roomMessages.RoomEstimateGrpc);
+     rpc OpenRoomToUpdate(roomMessages.RoomIdGrpc) returns (roomMessages.RoomUpdateGrpc);
+ }
+service RoomEstimateEventService{
+    rpc MonitorEvents(roomMessages.SubscriberGrpc) returns(stream roomMessages.RoomEstimateEventGrpc);
+   
+}         
+ service RoomEstimateService{
+     rpc LeaveRoom(roomMessages.RoomExitGrpc) returns (google.protobuf.Empty);
+     rpc EstimateContent(roomMessages.ContentEstimateGrpc) returns (google.protobuf.Empty);
+     rpc EndEstimation(roomMessages.RoomIdGrpc) returns (google.protobuf.Empty);
+ }
+ service RoomQueryService{
+     rpc GetRoomTitles(google.protobuf.Empty) returns(stream roomMessages.RoomTitleGrpc);
+     rpc GetPersonalRoomTitles(userMessages.UserIdGrpc) returns (stream roomMessages.RoomTitleGrpc);
+
+ }
+
+

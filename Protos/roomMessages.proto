@@ -1,0 +1,80 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "userMessages.proto";
+option csharp_namespace = "ContentRate.Protos";
+package roomMessages;
+
+message SubscriberGrpc{
+    string RoomId = 1;
+    string AssesorId =2;
+}
+enum EventType {
+  ContentEstimated = 0;
+  AssessorJoined = 1;
+  AssessorLeaved = 2;
+  EstimationEnded = 3;
+}
+message RoomEstimateEventGrpc{
+    EventType EventType = 1;
+    string JsonBody = 2;
+}
+
+message RoomIdGrpc {
+    string Id = 1;
+}
+message RoomTitleGrpc {
+    string Name = 1;
+    userMessages.UserTitleGrpc Creator = 2;
+    string Id = 3;
+    uint32 AssessorCount = 4;
+    google.protobuf.Timestamp CreationTime = 5;
+}
+message ContentEstimateGrpc {
+    double NewValue = 1;
+    string AssessorId = 2;
+    string RoomId = 3;
+    string ContentId = 4;
+}
+ message RatingGrpc {
+     string AssessorId = 1;
+     double Value = 2;
+ }
+ message RoomEnterGrpc {
+    string UserId = 1;
+    string RoomId = 2;
+    google.protobuf.StringValue Password = 3;
+}
+message RoomExitGrpc {
+    string RoomId = 1;
+    string UserId = 2;
+}
+ message RoomDeleteGrpc{
+     string Id = 1;
+ }
+ message ContentDetailsGrpc {
+     string Id = 1;
+     string Name = 2;
+     uint32 ContentType = 3;
+     string Path = 4;
+     repeated RatingGrpc Ratings = 5;
+ }
+
+ message AssessorGrpc {
+     string Id = 1;
+     string Name = 2;
+     bool IsMock = 3;
+ }
+ message RoomEstimateGrpc{
+      string Id = 1;
+      string Name = 2;
+      repeated ContentDetailsGrpc Content = 3;
+      repeated AssessorGrpc Assessors = 4;
+      string CreatorId = 5;
+ }
+ message RoomUpdateGrpc
+ {
+     google.protobuf.StringValue Password = 1;
+     bool IsPrivate = 2;
+     RoomEstimateGrpc Room =3;
+ }

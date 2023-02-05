@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "ContentRate.Infrastructure": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:6438;http://localhost:6439"
+    }
+  }
+}

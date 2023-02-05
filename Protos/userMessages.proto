@@ -1,0 +1,30 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "ContentRate.Protos";
+
+package userMessages;
+
+ 
+ message IsUniqueUser{
+     bool Result = 1;
+ }
+ message UserCheckGrpc{
+     string Name = 1;
+ }
+ message LoginMessageGrpc{
+     string Name = 1;
+     string Password =2;
+ }
+ message RegisterMessageGrpc{
+     string Name = 1;
+     string Password =2;
+ }
+ message UserTitleGrpc {
+    string Id = 1;
+    string Name = 2;
+}
+message UserIdGrpc{
+    string Id = 1;
+}

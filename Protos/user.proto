@@ -1,0 +1,18 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "userMessages.proto";
+option csharp_namespace = "ContentRate.Protos";
+
+package user;
+
+ service UserQueryService{
+     rpc GetNotMockUsers(google.protobuf.Empty) returns (stream userMessages.UserTitleGrpc);
+     rpc GetAllUsers(google.protobuf.Empty) returns(stream userMessages.UserTitleGrpc);
+ }
+
+ service AuthService{
+     rpc Login(userMessages.LoginMessageGrpc) returns(userMessages.UserTitleGrpc);
+     rpc HasUser(userMessages.UserCheckGrpc) returns(userMessages.IsUniqueUser);
+     rpc Register(userMessages.RegisterMessageGrpc) returns(userMessages.UserTitleGrpc);
+ }
+ 
