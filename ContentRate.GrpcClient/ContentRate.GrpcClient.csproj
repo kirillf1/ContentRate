@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\Protos\room.proto" GrpcServices="Client">
+    <Protobuf Include="..\Protos\room.proto" GrpcServices="Client" Access="Public">
       <Link>Protos\room.proto</Link>
     </Protobuf>
     <Protobuf Include="..\Protos\user.proto" GrpcServices="Client">

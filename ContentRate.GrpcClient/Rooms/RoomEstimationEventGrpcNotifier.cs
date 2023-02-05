@@ -3,7 +3,6 @@ using ContentRate.Application.Contracts.Rooms;
 using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Events;
 using ContentRate.Application.Rooms;
-using ContentRate.ClientProtos;
 using ContentRate.GrpcClient.EventNotifiers;
 using ContentRate.Protos;
 using Grpc.Core;

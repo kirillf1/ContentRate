@@ -1,4 +1,5 @@
-﻿@using ContentRate.ViewModels.Rooms;
+﻿@using ContentRate.Application.Contracts.Rooms;
+@using ContentRate.ViewModels.Rooms;
 @page "/roomlist"
 @inherits ReactiveComponentBase<RoomListViewModel>
 
@@ -14,25 +15,38 @@
         </MudGrid>
     </MudItem>
 </MudGrid>
-<MudGrid>
-    @foreach (var roomTitle in ViewModel.RoomTitles)
-    {
-        <MudItem xs="12" md="6">
-            <MudCard>
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6" >@roomTitle.Name</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudText>Создатель: @roomTitle.Creator.Name</MudText>
-                    <MudText Typo="Typo.body2">Оценивают: @roomTitle.AssessorCount чел.</MudText>
-                    <MudText Typo="Typo.body2">Дата создания: @roomTitle.CreationTime.ToShortDateString()</MudText>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudButton Variant="Variant.Text" Color="Color.Primary">Войти</MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-    }
-</MudGrid>
+@if (ViewModel.IsBusy)
+{
+    <div class="d-flex justify-center m-4">
+        <MudProgressCircular  Style="height:300px;width:300px" Size="Size.Large"
+                         Color="Color.Primary" Indeterminate="true" />
+    </div>
+
+}
+else
+{
+    <MudGrid>
+        <MudVirtualize T="RoomTitle" Context="roomTitle" Items="ViewModel.RoomTitles" OverscanCount="5">
+        @*@foreach (var roomTitle in ViewModel.RoomTitles.Items)
+        {*@
+            <MudItem xs="12" md="6">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">@roomTitle.Name</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>Создатель: @roomTitle.Creator.Name</MudText>
+                        <MudText Typo="Typo.body2">Оценивают: @roomTitle.AssessorCount чел.</MudText>
+                        <MudText Typo="Typo.body2">Дата создания: @roomTitle.CreationTime.ToShortDateString()</MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Text" Color="Color.Primary">Войти</MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+       @* }*@
+        </MudVirtualize>
+    </MudGrid>
+}

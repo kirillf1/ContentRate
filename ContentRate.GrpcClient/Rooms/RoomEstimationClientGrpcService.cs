@@ -2,7 +2,6 @@
 using ContentRate.Application.Contracts.Content;
 using ContentRate.Application.Contracts.Rooms;
 using ContentRate.Application.Rooms;
-using ContentRate.ClientProtos;
 using ContentRate.GrpcExtensions.Helpers;
 using ContentRate.Protos;
 

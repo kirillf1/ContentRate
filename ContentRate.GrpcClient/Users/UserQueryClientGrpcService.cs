@@ -3,15 +3,16 @@ using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
 using Grpc.Core;
-
+using ContentRate.Protos;
+using UserQueryService = ContentRate.Protos.UserQueryService;
 
 namespace ContentRate.GrpcClient.Users
 {
     public class UserQueryClientGrpcService : IUserQueryService
     {
-        private readonly ClientProtos.UserQueryService.UserQueryServiceClient client;
+        private readonly UserQueryService.UserQueryServiceClient client;
 
-        public UserQueryClientGrpcService(ClientProtos.UserQueryService.UserQueryServiceClient client)
+        public UserQueryClientGrpcService(UserQueryService.UserQueryServiceClient client)
         {
             this.client = client;
         }

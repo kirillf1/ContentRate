@@ -1,5 +1,7 @@
 ﻿using ContentRate.ViewModels.Rooms;
 using Microsoft.AspNetCore.Components;
+using ReactiveUI;
+using System.Reactive.Linq;
 
 namespace ContentRate.BlazorComponents.Rooms
 {
@@ -12,8 +14,17 @@ namespace ContentRate.BlazorComponents.Rooms
             set => ViewModel = value;
 
         }
+        public RoomList()
+        {
+           
+        }
         protected override async Task OnInitializedAsync()
         {
+
+            //this.WhenAnyObservable(x => x.ViewModel.RoomTitles.CountChanged).
+            //    ObserveOn(RxApp.MainThreadScheduler).
+            //   //Throttle(TimeSpan.FromMilliseconds(1), RxApp.MainThreadScheduler).
+            //   Subscribe(x => StateHasChanged());
             await ViewModel!.LoadRooms();
         }
     }

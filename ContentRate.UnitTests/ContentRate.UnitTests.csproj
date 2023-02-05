@@ -28,7 +28,7 @@
     <ProjectReference Include="..\ContentRate.Application\ContentRate.Application.csproj" />
     <ProjectReference Include="..\ContentRate.Domain\ContentRate.Domain.csproj" />
     <ProjectReference Include="..\ContentRate.GrpcClient\ContentRate.GrpcClient.csproj">
-      <Aliases></Aliases>
+      <Aliases>GrpcClient</Aliases>
     </ProjectReference>
     <ProjectReference Include="..\ContentRate.GrpcService\ContentRate.GrpcService.csproj" />
     <ProjectReference Include="..\ContentRate.Infrastructure\ContentRate.Infrastructure.csproj" />

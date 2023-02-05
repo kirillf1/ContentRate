@@ -1,9 +1,11 @@
-﻿using ContentRate.Application.Contracts.Rooms;
+﻿extern alias GrpcClient;
+using ContentRate.Application.Contracts.Rooms;
 using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Rooms;
-using ContentRate.GrpcClient.Rooms;
 using ContentRate.UnitTests.GrpcIntergrationTests.Helpers;
 using Xunit.Abstractions;
+using ContentRate.Protos;
+using GrpcClient::ContentRate.GrpcClient.Rooms;
 
 namespace ContentRate.UnitTests.GrpcIntergrationTests
 {
@@ -24,11 +26,11 @@ namespace ContentRate.UnitTests.GrpcIntergrationTests
             var room = rooms.First();
             var firstChannel = CreateChannel();
             var secondChannel = CreateChannel();
-            IRoomService roomServiceFirst = new RoomClientGrpcService(new ClientProtos.RoomService.RoomServiceClient(firstChannel));
-            IRoomService roomServiceSecond = new RoomClientGrpcService(new ClientProtos.RoomService.RoomServiceClient(secondChannel));
-            IRoomEstimationService estimationClient = new RoomEstimationClientGrpcService(new ClientProtos.RoomEstimateService.RoomEstimateServiceClient(firstChannel));
+            IRoomService roomServiceFirst = new RoomClientGrpcService(new GrpcClient.ContentRate.Protos.RoomService.RoomServiceClient(firstChannel));
+            IRoomService roomServiceSecond = new RoomClientGrpcService(new GrpcClient.ContentRate.Protos.RoomService.RoomServiceClient(secondChannel));
+            IRoomEstimationService estimationClient = new RoomEstimationClientGrpcService(new GrpcClient.ContentRate.Protos.RoomEstimateService.RoomEstimateServiceClient(firstChannel));
             
-            var notifier = new RoomEstimationEventGrpcNotifier(new ClientProtos.RoomEstimateEventService.RoomEstimateEventServiceClient(firstChannel));
+            var notifier = new RoomEstimationEventGrpcNotifier(new GrpcClient.ContentRate.Protos.RoomEstimateEventService.RoomEstimateEventServiceClient(firstChannel));
             var result = await roomServiceFirst.JoinRoom(new RoomEnter { AssessorId = userFirst.Id, RoomId = room.Id });
             notifier.AssessorJoined += AssessorJoined;
             var notifierTask = notifier.StartListenEvents(userFirst.Id, room.Id);
@@ -54,12 +56,12 @@ namespace ContentRate.UnitTests.GrpcIntergrationTests
             var firstChannel = CreateChannel();
             var secondChannel = CreateChannel();
             double newRating = 9.25;
-            IRoomService roomServiceFirst = new RoomClientGrpcService(new ClientProtos.RoomService.RoomServiceClient(firstChannel));
-            IRoomService roomServiceSecond = new RoomClientGrpcService(new ClientProtos.RoomService.RoomServiceClient(secondChannel));
-            IRoomEstimationService estimationClientFirst = new RoomEstimationClientGrpcService(new ClientProtos.RoomEstimateService.RoomEstimateServiceClient(firstChannel));
-            IRoomEstimationService estimationClientSecond = new RoomEstimationClientGrpcService(new ClientProtos.RoomEstimateService.RoomEstimateServiceClient(secondChannel));
+            IRoomService roomServiceFirst = new RoomClientGrpcService(new GrpcClient.ContentRate.Protos.RoomService.RoomServiceClient(firstChannel));
+            IRoomService roomServiceSecond = new RoomClientGrpcService(new GrpcClient.ContentRate.Protos.RoomService.RoomServiceClient(secondChannel));
+            IRoomEstimationService estimationClientFirst = new RoomEstimationClientGrpcService(new GrpcClient.ContentRate.Protos.RoomEstimateService.RoomEstimateServiceClient(firstChannel));
+            IRoomEstimationService estimationClientSecond = new RoomEstimationClientGrpcService(new GrpcClient.ContentRate.Protos.RoomEstimateService.RoomEstimateServiceClient(secondChannel));
            
-            var notifier = new RoomEstimationEventGrpcNotifier(new ClientProtos.RoomEstimateEventService.RoomEstimateEventServiceClient(secondChannel));
+            var notifier = new RoomEstimationEventGrpcNotifier(new  GrpcClient.ContentRate.Protos.RoomEstimateEventService.RoomEstimateEventServiceClient(secondChannel));
             var resultRoom = await roomServiceFirst.JoinRoom(new RoomEnter { AssessorId = userFirst.Id, RoomId = room.Id });
             notifier.ContentEstimated += ContentEstimated;
             var notifierTask = notifier.StartListenEvents(userFirst.Id, room.Id);

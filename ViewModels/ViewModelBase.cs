@@ -1,4 +1,5 @@
 ﻿using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,8 @@ namespace ContentRate.ViewModels
 {
     public class ViewModelBase : ReactiveObject
     {
+        [Reactive]
+        public bool IsBusy { get; protected set; }
+        
     }
 }

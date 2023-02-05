@@ -33,7 +33,7 @@ namespace ContentRate.Infrastructure.Repositories.EnitiesGenerator
         public Task<IEnumerable<Room>> GetRooms(RoomSearchCreteria roomSearch)
         {
             var rooms = new List<Room>();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 rooms.Add(RoomFactory.CreateRoom(Guid.NewGuid(), 20, Guid.NewGuid(), false));
             }
@@ -43,7 +43,7 @@ namespace ContentRate.Infrastructure.Repositories.EnitiesGenerator
         public Task<IEnumerable<Room>> GetRoomsWithoutContent(RoomSearchCreteria roomSearch)
         {
             var rooms = new List<Room>();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 rooms.Add(RoomFactory.CreateRoom(Guid.NewGuid(), 20, Guid.NewGuid(), false));
             }

@@ -1,6 +1,7 @@
-﻿using ContentRate.ClientProtos;
-using ContentRate.GrpcClient.Rooms;
+﻿extern alias GrpcClient;
+using ContentRate.Protos;
 using ContentRate.UnitTests.GrpcIntergrationTests.Helpers;
+using GrpcClient::ContentRate.GrpcClient.Rooms;
 using Xunit.Abstractions;
 
 namespace ContentRate.UnitTests.GrpcIntergrationTests
@@ -19,7 +20,7 @@ namespace ContentRate.UnitTests.GrpcIntergrationTests
             await PreloadRooms(userId, roomCount, false);
             await PreloadRooms(userId,roomCount, true);
             
-            var client = new RoomQueryClientGrpcService(new RoomQueryService.RoomQueryServiceClient(Channel));
+            var client = new RoomQueryClientGrpcService(new GrpcClient.ContentRate.Protos.RoomQueryService.RoomQueryServiceClient(Channel));
             var result = await client.GetRoomTitles();
 
             Assert.True(result.IsSuccess);
@@ -35,7 +36,7 @@ namespace ContentRate.UnitTests.GrpcIntergrationTests
             await PreloadRooms(userId, roomCount, false);
             await PreloadRooms(userId, roomCount, true);
 
-            var client = new RoomQueryClientGrpcService(new RoomQueryService.RoomQueryServiceClient(Channel));
+            var client = new RoomQueryClientGrpcService(new GrpcClient.ContentRate.Protos.RoomQueryService.RoomQueryServiceClient(Channel));
             var result = await client.GetPersonalRoomTitles(userId);
 
             Assert.True(result.IsSuccess);

@@ -1,6 +1,6 @@
 ﻿using ContentRate.Application.Contracts.Rooms;
 using ContentRate.Application.Rooms;
-using ReactiveUI;
+using DynamicData;
 using System.Collections.ObjectModel;
 
 namespace ContentRate.ViewModels.Rooms
@@ -14,16 +14,27 @@ namespace ContentRate.ViewModels.Rooms
             this.roomQueryService = roomQueryService;
             RoomTitles = new();
         }
-        public ObservableCollection<RoomTitle> RoomTitles { get; private set; }
+        public List<RoomTitle> RoomTitles { get; private set; }
         public async Task LoadRooms()
         {
-            var roomsResult = await roomQueryService.GetRoomTitles();
-            if (!roomsResult.IsSuccess)
-                throw new Exception(string.Join(",", roomsResult.Errors));
-            foreach (var item in roomsResult.Value)
+            try
             {
-                RoomTitles.Add(item);
+                IsBusy = false;
+                var roomsResult = await roomQueryService.GetRoomTitles();
+                if (!roomsResult.IsSuccess)
+                    throw new Exception(string.Join(",", roomsResult.Errors));
+                IsBusy = false;
+                RoomTitles.AddRange(roomsResult.Value);
+                //foreach (var item in roomsResult.Value)
+                //{
+                //    RoomTitles.Add(item);
+                //}
             }
+            finally
+            {
+                IsBusy = false;
+            }
+
         }
     }
 }

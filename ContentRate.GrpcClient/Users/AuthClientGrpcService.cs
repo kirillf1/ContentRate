@@ -2,14 +2,15 @@
 using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
+using ContentRate.Protos;
+using AuthService = ContentRate.Protos.AuthService;
 
 namespace ContentRate.GrpcClient.Users
 {
     internal class AuthClientGrpcService : IAuthService
     {
-        private readonly ClientProtos.AuthService.AuthServiceClient client;
-
-        public AuthClientGrpcService(ClientProtos.AuthService.AuthServiceClient client)
+        private readonly AuthService.AuthServiceClient client;
+        public AuthClientGrpcService(AuthService.AuthServiceClient client)
         {
             this.client = client;
         }

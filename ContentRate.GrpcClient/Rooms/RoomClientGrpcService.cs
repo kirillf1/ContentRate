@@ -3,14 +3,15 @@ using ContentRate.Application.Contracts.Rooms;
 using ContentRate.Application.Rooms;
 using ContentRate.GrpcExtensions.Helpers;
 using ContentRate.Protos;
+using RoomService = ContentRate.Protos.RoomService;
 
 namespace ContentRate.GrpcClient.Rooms
 {
     public class RoomClientGrpcService : IRoomService
     {
-        private readonly ClientProtos.RoomService.RoomServiceClient client;
+        private readonly RoomService.RoomServiceClient client;
 
-        public RoomClientGrpcService(ClientProtos.RoomService.RoomServiceClient client)
+        public RoomClientGrpcService(RoomService.RoomServiceClient client)
         {
             this.client = client;
         }
