@@ -1,9 +1,7 @@
 using ContentRate.Application.Rooms;
 using ContentRate.BlazorServer.Client.Pages;
-using ContentRate.Protos;
 using ContentRate.GrpcClient.Rooms;
 using ContentRate.ViewModels.Rooms;
-using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;

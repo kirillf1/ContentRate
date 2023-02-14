@@ -3,22 +3,23 @@
 @page "/roomlist"
 @inherits ReactiveComponentBase<RoomListViewModel>
 
-<MudGrid>
-    <MudItem xs="12">
-        <MudGrid Class="sticky">
-            <MudItem xs="6">
-                <MudText Typo="Typo.h3">Список комнат</MudText>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField T="string" Label="Search" Variant="Variant.Text" Margin="Margin.Dense" />
-            </MudItem>
-        </MudGrid>
+
+
+<MudGrid Class="mt-3" Justify="Justify.SpaceBetween">
+    <MudItem Class="d-flex">
+        <MudText Class="align-self-center" Typo="Typo.h5">Список комнат</MudText>
+    </MudItem>
+    <MudItem xs="6">
+        <MudTextField @bind-Text="ViewModel.SearchText" T="string" Label="Название комнаты" Variant="Variant.Outlined"  />
+    </MudItem>
+    <MudItem Class="d-flex">
+        <MudButton Class="align-self-center" Variant="Variant.Filled" Color="Color.Primary">Создать комнату</MudButton>
     </MudItem>
 </MudGrid>
-@if (ViewModel.IsBusy)
+@if (ViewModel!.RoomTitles is null || ViewModel.IsBusy)
 {
     <div class="d-flex justify-center m-4">
-        <MudProgressCircular  Style="height:300px;width:300px" Size="Size.Large"
+        <MudProgressCircular Style="height:300px;width:300px" Size="Size.Large"
                          Color="Color.Primary" Indeterminate="true" />
     </div>
 
@@ -26,9 +27,7 @@
 else
 {
     <MudGrid>
-        <MudVirtualize T="RoomTitle" Context="roomTitle" Items="ViewModel.RoomTitles" OverscanCount="5">
-        @*@foreach (var roomTitle in ViewModel.RoomTitles.Items)
-        {*@
+        <MudVirtualize T="RoomTitle" Items="ViewModel.RoomTitles" Context="roomTitle" OverscanCount="10">
             <MudItem xs="12" md="6">
                 <MudCard>
                     <MudCardHeader>
@@ -46,7 +45,6 @@ else
                     </MudCardActions>
                 </MudCard>
             </MudItem>
-       @* }*@
         </MudVirtualize>
     </MudGrid>
 }
