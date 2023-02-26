@@ -1,25 +1,32 @@
 ﻿@using System.Text.RegularExpressions;
+@using ContentRate.Application.Contracts.Users;
 @using ContentRate.Application.Users;
 @page "/register"
-<MudPaper Class="pa-4">
-    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-        <MudTextField T="string" Label="Имя пользователя" Required="true" RequiredError="Имя обязательно!" />
+<div class="mt-5 d-flex justify-content-center">
+    <MudPaper Class="pa-4 form-width">
+        <MudText Typo="Typo.h6">Регистрация</MudText>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField OnlyValidateIfDirty="true" @bind-Value="registerModel.Name" T="string" Label="Имя пользователя"
+                          Required="true" RequiredError="Имя обязательно!"
+                          Validation="@(new Func<string, Task<string>>(NameValidation))" />
+            <MudTextField @bind-Value="registerModel.Password" T="string" Label="Password"
+                          HelperText="Введите пароль" @ref="passwordField" OnlyValidateIfDirty="true"
+                          InputType="InputType.Password"
+                          Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                          RequiredError="Пароль обязателен!" />
+            <MudTextField T="string" OnlyValidateIfDirty="true"
+                          Label="Password" HelperText="Повторите пароль" InputType="InputType.Password"
+                          Validation="@(new Func<string, string>(PasswordMatch))" />
 
-        <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="passwordField"
-                      InputType="InputType.Password"
-                      Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
-                      RequiredError="Пароль обязателен!" />
-        <MudTextField T="string"
-                      Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
-                      Validation="@(new Func<string, string>(PasswordMatch))" />
-
-        <div class="d-flex align-center justify-space-between">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
-        </div>
-    </MudForm>
-</MudPaper>
-
+            <div class="d-flex align-center justify-space-between">
+                <MudButton OnClick="@RegisterUser" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Зарегистрироваться</MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+</div>
 @code {
+    // перенести логику в ViewModel
+    private RegisterModel registerModel = new() { Name = "", Password = "" };
     [Inject]
     public IAuthService AuthService { get; set; }
     private bool success;
@@ -43,5 +50,25 @@
         if (passwordField.Value != arg)
             return "Пароли не совпадают";
         return null;
+    }
+    private async Task<string> NameValidation(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "Имя обязательно!";
+        }
+        var hasUserResult = await AuthService.HasUser(name);
+        if (!hasUserResult.IsSuccess || !hasUserResult.Value)
+        {
+            return "Пользователь с таким именем уже есть";
+        }
+        return null;
+    }
+    private async Task RegisterUser()
+    {
+        await form.Validate();
+        if (!form.IsValid)
+            return;
+        await AuthService.Register(registerModel);
     }
 }

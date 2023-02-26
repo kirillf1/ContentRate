@@ -8,7 +8,9 @@
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu"
                        Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        My Application
+        Оценка контента
+        <MudSpacer />
+        <MudIconButton Href="/register" Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" />
     </MudAppBar>
     <MudDrawer ClipMode="DrawerClipMode.Always" @bind-Open="@_drawerOpen">
         <NavMenu />
@@ -18,9 +20,9 @@
             @Body
         </MudContainer>
     </MudMainContent>
-        <MudScrollToTop>
+    <MudScrollToTop>
         <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowUpward" />
-        </MudScrollToTop>
+    </MudScrollToTop>
 </MudLayout>
 @code {
     bool _drawerOpen = true;

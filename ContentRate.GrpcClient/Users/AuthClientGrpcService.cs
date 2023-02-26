@@ -2,12 +2,11 @@
 using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
-using ContentRate.Protos;
 using AuthService = ContentRate.Protos.AuthService;
 
 namespace ContentRate.GrpcClient.Users
 {
-    internal class AuthClientGrpcService : IAuthService
+    public class AuthClientGrpcService : IAuthService
     {
         private readonly AuthService.AuthServiceClient client;
         public AuthClientGrpcService(AuthService.AuthServiceClient client)
@@ -19,7 +18,8 @@ namespace ContentRate.GrpcClient.Users
             try
             {
                 var isUniqueUser = await client.HasUserAsync(new Protos.UserCheckGrpc { Name = name });
-                return !isUniqueUser.Result;
+                Console.WriteLine("check");
+                return isUniqueUser.Result;
             }
             catch (Exception ex)
             {
