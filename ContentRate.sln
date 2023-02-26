@@ -27,6 +27,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentRate.BlazorServer.Cl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentRate.ViewModels", "ViewModels\ContentRate.ViewModels.csproj", "{36999853-1498-4CD7-97A5-54F550EE9927}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{EA136716-AE1C-4B24-954A-69F9DC98EAE3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Youtube.Extensions", "Youtube.Extensions\Youtube.Extensions.csproj", "{DF548FA8-82A2-4111-9AA9-58054BAB6100}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +77,10 @@ Global
 		{36999853-1498-4CD7-97A5-54F550EE9927}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36999853-1498-4CD7-97A5-54F550EE9927}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36999853-1498-4CD7-97A5-54F550EE9927}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF548FA8-82A2-4111-9AA9-58054BAB6100}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF548FA8-82A2-4111-9AA9-58054BAB6100}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF548FA8-82A2-4111-9AA9-58054BAB6100}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF548FA8-82A2-4111-9AA9-58054BAB6100}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,6 +91,7 @@ Global
 		{C888DE78-C4F2-4831-BC76-1F7103FC5414} = {7B939868-E267-47AC-AA07-3FABC47A4EE6}
 		{15F789FC-B8F2-4A91-8F4B-D102FA917C67} = {7B939868-E267-47AC-AA07-3FABC47A4EE6}
 		{36999853-1498-4CD7-97A5-54F550EE9927} = {7B939868-E267-47AC-AA07-3FABC47A4EE6}
+		{DF548FA8-82A2-4111-9AA9-58054BAB6100} = {EA136716-AE1C-4B24-954A-69F9DC98EAE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EF56D02C-BA0E-454B-A6E3-68717A470098}

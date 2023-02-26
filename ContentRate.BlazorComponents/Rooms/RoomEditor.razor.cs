@@ -1,6 +1,83 @@
-﻿namespace ContentRate.BlazorComponents.Rooms
+﻿using ContentRate.Application.ContentServices;
+using ContentRate.Domain.Rooms;
+using ContentRate.ViewModels.Rooms;
+using DynamicData;
+using DynamicData.Binding;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
+using ReactiveUI;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+
+namespace ContentRate.BlazorComponents.Rooms
 {
     public partial class RoomEditor
     {
+        private static readonly Dictionary<ContentType, string> ContentNames = new()
+        {
+            {ContentType.Audio, "Аудио" },
+            {ContentType.Video, "Видео" },
+            {ContentType.Image, "Фото" }
+        };
+        public RoomEditor()
+        {
+
+            this.WhenActivated(disposableRegistration =>
+            {
+                this.EditViewModel.Content.ToObservableChangeSet()
+                .ToCollection()
+                .Throttle(TimeSpan.FromMilliseconds(100))
+                .Subscribe(_ => StateHasChanged())
+                .DisposeWith(disposableRegistration);
+
+                this.EditViewModel.MockAssessors.ToObservableChangeSet()
+               .ToCollection()
+               .Throttle(TimeSpan.FromMilliseconds(100))
+               .Subscribe(_ => StateHasChanged())
+               .DisposeWith(disposableRegistration);
+            });
+        }
+        [Inject]
+        public RoomEditViewModel EditViewModel
+        {
+            get => ViewModel!;
+            set => ViewModel = value;
+        }
+        [Parameter]
+        public Guid? Id { get; set; }
+
+        public string Title => Id is null ? "Создать комнату" : "Редактировать комнату";
+        InputType PasswordInput = InputType.Password;
+        string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+        bool isShow;
+        protected async override Task OnInitializedAsync()
+        {
+            if (Id is null)
+            {
+                EditViewModel.CreateNewRoom(Guid.NewGuid());
+                return;
+            }
+            await EditViewModel.LoadRoom(Id.Value);
+        }
+        private void PasswordShowClicked()
+        {
+            if (isShow)
+            {
+                isShow = false;
+                PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+                PasswordInput = InputType.Password;
+            }
+            else
+            {
+                isShow = true;
+                PasswordInputIcon = Icons.Material.Filled.Visibility;
+                PasswordInput = InputType.Text;
+            }
+        }
+        private async Task ImportContent(IContentImporter contentImporter)
+        {
+            await EditViewModel.ImportContentCommand.Execute(contentImporter).ToTask();
+        }
     }
 }

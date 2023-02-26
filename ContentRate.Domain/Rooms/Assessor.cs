@@ -2,7 +2,7 @@
 {
     public class Assessor
     {
-        public Assessor(Guid id, string name,bool isMockAssessor = false) 
+        public Assessor(Guid id, string name, bool isMockAssessor = false)
         {
             Id = id;
             Name = name;

@@ -10,13 +10,13 @@
         <MudText Class="align-self-center" Typo="Typo.h5">Список комнат</MudText>
     </MudItem>
     <MudItem xs="6">
-        <MudTextField @bind-Text="ViewModel.SearchText" T="string" Label="Название комнаты" Variant="Variant.Outlined"  />
+        <MudTextField @bind-Text="RoomViewModel.SearchText" T="string" Label="Название комнаты" Variant="Variant.Outlined" />
     </MudItem>
     <MudItem Class="d-flex">
-        <MudButton Class="align-self-center" Variant="Variant.Filled" Color="Color.Primary">Создать комнату</MudButton>
+        <MudButton Href="/roomeditor" Class="align-self-center" Variant="Variant.Filled" Color="Color.Primary">Создать комнату</MudButton>
     </MudItem>
 </MudGrid>
-@if (ViewModel!.RoomTitles is null || ViewModel.IsBusy)
+@if (RoomViewModel.RoomTitles is null || RoomViewModel.IsBusy)
 {
     <div class="d-flex justify-center m-4">
         <MudProgressCircular Style="height:300px;width:300px" Size="Size.Large"
@@ -27,13 +27,16 @@
 else
 {
     <MudGrid>
-        <MudVirtualize T="RoomTitle" Items="ViewModel.RoomTitles" Context="roomTitle" OverscanCount="10">
+        <MudVirtualize T="RoomTitle" Items="RoomViewModel.RoomTitles" Context="roomTitle" OverscanCount="10">
             <MudItem xs="12" md="6">
                 <MudCard>
                     <MudCardHeader>
                         <CardHeaderContent>
                             <MudText Typo="Typo.h6">@roomTitle.Name</MudText>
                         </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudIconButton Href=@string.Concat("/roomeditor/",roomTitle.Id) Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
+                        </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent>
                         <MudText>Создатель: @roomTitle.Creator.Name</MudText>

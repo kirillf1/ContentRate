@@ -48,7 +48,7 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
 
         public async Task<bool> HasUser(string name)
         {
-           return await context.Users.AnyAsync(c => c.Name == name);
+            return await context.Users.AnyAsync(c => c.Name == name);
         }
 
         public async Task SaveChanges(CancellationToken cancellationToken = default)
@@ -59,7 +59,7 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
         public async Task<User?> TryGetUser(string name, string password)
         {
             return await context.Users.Where(u => u.Name == name && u.Password == password).
-                Select(u=>UserConverter.ConvertModelToUser(u))
+                Select(u => UserConverter.ConvertModelToUser(u))
                 .SingleOrDefaultAsync();
         }
 

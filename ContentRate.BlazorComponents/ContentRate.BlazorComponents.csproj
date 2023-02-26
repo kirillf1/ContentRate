@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ViewModels\ContentRate.ViewModels.csproj" />
+    <ProjectReference Include="..\Youtube.Extensions\Youtube.Extensions.csproj" />
   </ItemGroup>
 
 </Project>

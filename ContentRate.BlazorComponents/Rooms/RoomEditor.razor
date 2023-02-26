@@ -1,7 +1,126 @@
-﻿@page "/roomeditor"
-@page "/roomeditor/{id}"
-<h3>RoomEditor</h3>
+﻿@using ContentRate.ViewModels.Content;
+@using ContentRate.ViewModels.Rooms;
+@inherits ReactiveComponentBase<RoomEditViewModel>
+@page "/roomeditor"
+@page "/roomeditor/{id:guid}"
+<MudGrid Class="mt-3" Justify="Justify.SpaceBetween">
+    <MudItem xs="6" Class="d-flex justify-start">
+        <MudText Class="align-self-center" Typo="Typo.h5">@Title</MudText>
+    </MudItem>
+    <MudItem xs="6" Class="d-flex justify-end">
+        <MudButton Command="EditViewModel.SaveRoomCommand" Class="justify align-self-center" Variant="Variant.Filled" Color="Color.Primary">Сохранить комнату</MudButton>
+    </MudItem>
+</MudGrid>
+@if (EditViewModel is null)
+{
+    <div class="d-flex justify-center m-4">
+        <MudProgressCircular Style="height:300px;width:300px" Size="Size.Large"
+                         Color="Color.Primary" Indeterminate="true" />
+    </div>
+}
+else
+{
+    <MudTabs Class="mt-3" Elevation="1" Rounded="true" Centered="true" PanelClass="pa-6">
+        <!-- #region Блок комнаты -->
+        <MudTabPanel Text="Комната">
+            <MudGrid Spacing="4">
+                <MudItem xs="6" lg="4">
+                    <MudTextField @bind-Text="EditViewModel.Name" T="string" Label="Имя комнаты" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="6" lg="4">
+                    <MudTextField InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="PasswordShowClicked" @bind-Value="EditViewModel.Password" Label="Пароль(необяз.)" Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="6" lg="4">
+                    <MudSwitch Color="Color.Primary" @bind-Checked="EditViewModel.IsPrivate" LabelPosition="LabelPosition.Start" Label="Приватная комната" />
+                </MudItem>
+            </MudGrid>
 
-@code {
+        </MudTabPanel>
+        <!-- #endregion -->
+        <!-- #region Блок пользователей -->
+        <MudTabPanel Text="Офлайн пользователи">
+            <MudButton Command="EditViewModel.AddAssessorCommand" Variant="Variant.Filled" Color="Color.Primary">Добавить офлайн пользователя</MudButton>
+            <MudGrid Spacing="3">
+                @foreach (var assessor in EditViewModel.MockAssessors)
+                {
+                    <MudItem xs="12" md="6">
+                        <MudCard Outlined="true" Square="true" Class="mt-6">
+                            <MudCardHeader>
+                                <CardHeaderContent>
+                                    <MudText>Редактировать офлайн пользователя</MudText>
+                                </CardHeaderContent>
+                                <CardHeaderActions>
+                                    <MudIconButton Command="@EditViewModel.RemoveAssessorCommand" CommandParameter="@assessor.Id" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" />
+                                </CardHeaderActions>
+                            </MudCardHeader>
+                            <MudCardContent>
+                                <MudTextField @bind-Value="@assessor.Name" Label="Имя" />
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudTabPanel>
+        <!-- #endregion -->
+        <!-- #region Блок редактирования контента -->
+        <MudTabPanel @onclick="()=>{foreach(var cont in EditViewModel.Content)cont.NeedPreWatchContent = false;}" Text="Контент">
+            <MudExpansionPanels>
+                <!-- TODO добавить гибкую систему выгрузки контента, если еще будут -->
+                <MudExpansionPanel Text="Выгрузить контент">
+                    <ContentRate.BlazorComponents.Content.ContentImporters.YoutubeContentImporter ImportStarted="ImportContent" />
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+            <MudGrid Class="mt-3" Justify="Justify.SpaceBetween">
+                <MudItem xl="6">
+                    <MudButton Command="EditViewModel.AddContentCommand" Variant="Variant.Filled" Color="Color.Primary">Добавить контент</MudButton>
+                </MudItem>
+            </MudGrid>
+            <Virtualize OverscanCount="10" Context="content" Items="EditViewModel.Content">
+                @ShowContentEditor(content)
+            </Virtualize>
+        </MudTabPanel>
+        <!-- #endregion -->
+    </MudTabs>
+
+}
+@code
+{
+    private RenderFragment<ContentViewModel> ShowContentEditor => content =>
+    @<MudCard Outlined="true" Square="true" Class="mt-6">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <MudGrid>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="@content.Name" Label="Название" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField @bind-Value="content.Path" Label="Путь" />
+                    </MudItem>
+                    <MudItem xs="6">
+                        <MudSelect @bind-Value="@content.ContentType" T="ContentRate.Domain.Rooms.ContentType" Label="Тип контента" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var contentType in ContentNames)
+                            {
+                                <MudSelectItem Value="contentType.Key">@contentType.Value</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                </MudGrid>
+            </CardHeaderContent>
+            <CardHeaderActions>
+                <MudIconButton Command="@EditViewModel.RemoveContentCommand" CommandParameter="@content.Id" Icon="@Icons.Material.Filled.Delete" Color="Color.Error" />
+            </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+            @if (content.NeedPreWatchContent)
+            {
+                <ContentViewer ContentType=@content.ContentType Path=@content.Path />
+            }
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton OnClick="()=>content.NeedPreWatchContent = !content.NeedPreWatchContent" StartIcon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Default">
+                @(content.NeedPreWatchContent ? "Скрыть контент" : "Посмотреть контент")
+            </MudButton>
+        </MudCardActions>
+    </MudCard>;
 
 }

@@ -1,28 +1,33 @@
 ﻿using ContentRate.Domain.Rooms;
 using ContentRate.Infrastructure.Repositories.EnitiesGenerator.Factories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ContentRate.Infrastructure.Repositories.EnitiesGenerator
 {
     public class RoomGenerator : IRoomRepository
     {
-        public Task AddRoom(Room room)
+        public RoomGenerator()
         {
-            throw new NotImplementedException();
+
+        }
+
+        private static List<Room> rooms = new();
+        public async Task AddRoom(Room room)
+        {
+            await UpdateRoom(room);
         }
 
         public Task DeleteRoom(Guid id)
         {
-            throw new NotImplementedException();
+            if (rooms.Any(c => c.Id == id))
+                rooms.Remove(rooms.First(c => c.Id == id));
+            return Task.CompletedTask;
         }
 
         public Task<Room> GetRoomById(Guid id)
         {
-            throw new NotImplementedException();
+            if (!rooms.Any(c => c.Id == id))
+                return Task.FromResult(RoomFactory.CreateRoom(id, 500));
+            return Task.FromResult(rooms.First(c => c.Id == id));
         }
 
         public Task<RoomDetails> GetRoomDetailsById(Guid id)
@@ -32,32 +37,37 @@ namespace ContentRate.Infrastructure.Repositories.EnitiesGenerator
 
         public Task<IEnumerable<Room>> GetRooms(RoomSearchCreteria roomSearch)
         {
-            var rooms = new List<Room>();
+            if (rooms.Count == 0)
+                rooms = new List<Room>();
             for (int i = 0; i < 100; i++)
             {
-                rooms.Add(RoomFactory.CreateRoom(Guid.NewGuid(), 20, Guid.NewGuid(), false));
+                rooms.Add(RoomFactory.CreateRoom(Guid.NewGuid(), 500, Guid.NewGuid(), false));
             }
             return Task.FromResult(rooms.AsEnumerable());
         }
 
         public Task<IEnumerable<Room>> GetRoomsWithoutContent(RoomSearchCreteria roomSearch)
         {
-            var rooms = new List<Room>();
+            if (rooms.Count == 0)
+                rooms = new List<Room>();
             for (int i = 0; i < 100; i++)
             {
-                rooms.Add(RoomFactory.CreateRoom(Guid.NewGuid(), 20, Guid.NewGuid(), false));
+                rooms.Add(RoomFactory.CreateRoom(Guid.NewGuid(), 500, Guid.NewGuid(), false));
             }
             return Task.FromResult(rooms.AsEnumerable());
         }
 
         public Task SaveChanges(CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
         public Task UpdateRoom(Room room)
         {
-            throw new NotImplementedException();
+            if (rooms.Any(c => c.Id == room.Id))
+                rooms.Remove(rooms.First(c => c.Id == room.Id));
+            rooms.Add(room);
+            return Task.CompletedTask;
         }
     }
 }

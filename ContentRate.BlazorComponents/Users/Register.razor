@@ -1,0 +1,47 @@
+﻿@using System.Text.RegularExpressions;
+@using ContentRate.Application.Users;
+@page "/register"
+<MudPaper Class="pa-4">
+    <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        <MudTextField T="string" Label="Имя пользователя" Required="true" RequiredError="Имя обязательно!" />
+
+        <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="passwordField"
+                      InputType="InputType.Password"
+                      Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                      RequiredError="Пароль обязателен!" />
+        <MudTextField T="string"
+                      Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
+                      Validation="@(new Func<string, string>(PasswordMatch))" />
+
+        <div class="d-flex align-center justify-space-between">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
+        </div>
+    </MudForm>
+</MudPaper>
+
+@code {
+    [Inject]
+    public IAuthService AuthService { get; set; }
+    private bool success;
+    private string[] errors = { };
+    private MudTextField<string> passwordField;
+    private MudForm form;
+
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Пароль обязателен!";
+            yield break;
+        }
+        if (pw.Length < 5)
+            yield return "Длина пароля должна быть больше 5";
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (passwordField.Value != arg)
+            return "Пароли не совпадают";
+        return null;
+    }
+}

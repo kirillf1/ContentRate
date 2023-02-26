@@ -1,0 +1,25 @@
+﻿@using ContentRate.Application.ContentServices;
+<MudGrid Justify="Justify.SpaceBetween" Spacing="2">
+    <MudItem xs="6">
+        <MudTextField Variant="Variant.Outlined" T="string" Label="Api ключ" @bind-Text="@ApiKey" />
+    </MudItem>
+    <MudItem xs="6">
+        <MudTextField Variant="Variant.Outlined" T="string" Label="Плейлист id" @bind-Text="@Playlist" />
+    </MudItem>
+    <MudButton OnClick="StartImport">Выгрузить</MudButton>
+</MudGrid>
+
+@code {
+    //лучше добавить сюда factory
+    [Inject]
+    public Youtube.Extensions.YoutubeContentImporter Importer { get; set; } = null!;
+    [Parameter]
+    public EventCallback<IContentImporter> ImportStarted { get; set; }
+    public string ApiKey { get; set; } = "";
+    public string Playlist { get; set; } = "";
+    private async Task StartImport()
+    {
+        Importer.Init(Playlist, ApiKey);
+        await ImportStarted.InvokeAsync(Importer);
+    }
+}

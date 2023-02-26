@@ -6,24 +6,24 @@ using System.Reactive.Disposables;
 namespace ContentRate.BlazorComponents.Rooms
 {
     public partial class RoomList
-    {
-        public bool CanSearch
-        {
-            get => canSearch;
-            set
-            {
-                canSearch = value ? false : true;
-                StateHasChanged();
-            }
-        }
-        private bool canSearch;
+    {      
         [Inject]
-        public RoomListViewModel FetchViewModel
+        public RoomListViewModel RoomViewModel
         {
             get => ViewModel!;
             set => ViewModel = value;
 
         }
+        public bool CanSearch
+        {
+            get => canSearch;
+            set
+            {
+                canSearch = !value;
+                StateHasChanged();
+            }
+        }
+        private bool canSearch;
         public RoomList()
         {
             this.WhenActivated(disposableRegistration =>
@@ -34,6 +34,7 @@ namespace ContentRate.BlazorComponents.Rooms
                     .DisposeWith(disposableRegistration);
                 
             });
+          
         }
         protected override async Task OnInitializedAsync()
         {

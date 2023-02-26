@@ -1,0 +1,19 @@
+﻿<!-- TODO рефакторинг путем переноса либо в отдельные разор компоненты, либо создать Factory renderfragment -->
+@switch (ContentType)
+{
+    case Domain.Rooms.ContentType.Video:
+        <div style="height:600px;" class="embed-responsive embed-responsive-16by9">
+            <iframe allow='autoplay' class="embed-responsive-item" src="@Path" allowfullscreen />
+        </div>
+        break;
+    case Domain.Rooms.ContentType.Audio:
+        <audio autoplay controls>
+            <source src="@Path">
+       </audio>
+       break;
+    case Domain.Rooms.ContentType.Image:
+        <MudImage Fluid="true" Src="@Path" Alt="Фото не загрузилось" Class="rounded-lg" />
+        break;
+}
+
+
