@@ -1,10 +1,12 @@
 ﻿using ContentRate.Application.Rooms;
 using ContentRate.Application.Users;
+using ContentRate.GrpcService.Authorization;
 using ContentRate.GrpcService.GrpcServices.Events;
 using ContentRate.GrpcService.GrpcServices.Rooms;
 using ContentRate.GrpcService.GrpcServices.Users;
 using ContentRate.Infrastructure.Contexts;
 using ContentRate.Infrastructure.Repositories.EfRepositories;
+using ContentRate.UnitTests.GrpcIntergrationTests.Helpers.MockServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +30,14 @@ namespace ContentRate.UnitTests.GrpcIntergrationTests.Helpers
             services.AddSingleton<IRoomEstimationService, RoomEstimationService>();
             services.AddSingleton<IRoomQueryService, RoomQueryService>();
             services.AddSingleton<IUserQueryService, UserQueryService>();
-            services.AddSingleton<IAuthService, AuthService>();          
+            services.AddSingleton<IAuthService, AuthService>();
             services.AddSingleton<RoomEstimateNotifier>();
             services.AddSingleton<RoomEstimateEventListenerStorage>();
-
+            services.AddSingleton<ITokenGenerator, TokenMockGenerator>();
+            services.AddSingleton<ITokenProvider, TokenMockProvider>();
         }
 
-        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseRouting();
             

@@ -3,9 +3,9 @@ using ContentRate.Application.Events;
 
 namespace ContentRate.GrpcClient.EventNotifiers
 {
-    internal class ContentEstimatedNotifier : EventNotifier<ContentEstimate>
+    internal class ContentEstimatedListener : EventNotifier<ContentEstimate>
     {
-        public ContentEstimatedNotifier(ContentRateEventHandler<ContentEstimate> handler) : base(handler)
+        public ContentEstimatedListener(ContentRateEventHandler<ContentEstimate> handler) : base(handler)
         {
         }
     }

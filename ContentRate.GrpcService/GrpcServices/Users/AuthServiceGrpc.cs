@@ -1,17 +1,22 @@
 ﻿using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
+using ContentRate.GrpcService.Authorization;
 using ContentRate.Protos;
 using Grpc.Core;
+using Microsoft.AspNetCore.DataProtection;
+using System;
 
 namespace ContentRate.GrpcService.GrpcServices.Users
 {
     public class AuthServiceGrpc : Protos.AuthService.AuthServiceBase
     {
         private readonly IAuthService authService;
+        private readonly ITokenGenerator tokenGenerator;
 
-        public AuthServiceGrpc(IAuthService authService)
+        public AuthServiceGrpc(IAuthService authService, ITokenGenerator tokenGenerator)
         {
             this.authService = authService;
+            this.tokenGenerator = tokenGenerator;
         }
         public override async Task<IsUniqueUser> HasUser(UserCheckGrpc request, ServerCallContext context)
         {
@@ -40,6 +45,8 @@ namespace ContentRate.GrpcService.GrpcServices.Users
             });
             if (!result.IsSuccess)
                 throw new RpcException(new Status(StatusCode.Unknown, $"Errors: {string.Join(',', result.Errors)}"));
+            var token = await tokenGenerator.GenerateToken(result.Value);
+            await context.WriteResponseHeadersAsync(new Metadata() { { "Authorization", token } });
             return UserConverter.ConvertToUserTitleGrpc(result.Value);
         }
     }

@@ -51,7 +51,7 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
         public async Task<Room> GetRoomById(Guid id)
         {
             // выполняем запрос всех данных без селекта чтобы затречить,
-            // так как подозреваем, что комнта будет меняться и чтобы не грузить еще раз,
+            // так как подозреваем, что комната будет меняться и чтобы не грузить еще раз,
             //выполняем это заранее
             var roomModel = await context.Rooms.Include(c => c.Users)
                 .Include(c => c.ContentList)
@@ -138,7 +138,7 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
               .Where(c => !roomModel.Users.Any(n => n.Id == c.Id)).Select(c => c.Id).ToList();
             roomModel.Users.AddRange(await context.Users.Where(u => newUserIds.Contains(u.Id)).ToArrayAsync());
 
-        }      
+        }
         private void UpdateContent(Room room, RoomModel roomModel)
         {
             foreach (var contentModel in roomModel.ContentList
@@ -150,7 +150,7 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
             var contentToAdd = room.ContentList.Where(c => !roomModel.ContentList.Any(n => n.Id == c.Id)).ToList();
             foreach (var newContent in contentToAdd)
             {
-                var contentModel = ContentConventer.ConvertContentToModel(newContent,roomModel.Id);
+                var contentModel = ContentConventer.ConvertContentToModel(newContent, roomModel.Id);
                 roomModel.ContentList.Add(contentModel);
                 context.Content.Add(contentModel);
             }
@@ -165,6 +165,6 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
             }
         }
 
-        
+
     }
 }

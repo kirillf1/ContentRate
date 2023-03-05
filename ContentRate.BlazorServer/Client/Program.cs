@@ -1,5 +1,6 @@
 using ContentRate.Application.Rooms;
 using ContentRate.Application.Users;
+using ContentRate.BlazorServer.Client.Authorization;
 using ContentRate.BlazorServer.Client.Pages;
 using ContentRate.GrpcClient.Rooms;
 using ContentRate.GrpcClient.Users;
@@ -19,8 +20,15 @@ builder.Services.AddMudServices();
 //builder.Services.AddGrpcClient<AuthService.AuthServiceClient>(c => new AuthService.AuthServiceClient(channel));
 //builder.Services.AddGrpcClient<UserQueryService.UserQueryServiceClient>(c => new UserQueryService.UserQueryServiceClient(channel));
 var url = builder.Configuration["ServerUrl"];
-builder.Services.AddGrpcClient<RoomQueryService.RoomQueryServiceClient>(opt=>opt.Address = new(url))
-    .ConfigureChannel(c=> c.HttpHandler = new GrpcWebHandler(new HttpClientHandler()));
+
+builder.Services.AddGrpcClient<RoomQueryService.RoomQueryServiceClient>(opt => opt.Address = new(url))
+    .ConfigureChannel(c => c.HttpHandler = new GrpcWebHandler(new HttpClientHandler()))
+    .AddCallCredentials(async (context, metadata, serviceProvider) =>
+    {
+        var provider = serviceProvider.GetRequiredService<ITokenProvider>();
+        var token = await provider.GetToken();
+        metadata.Add("Authorization", $"Bearer {token}");
+    }).ConfigureChannel(o => o.UnsafeUseInsecureChannelCallCredentials = true);
 builder.Services.AddGrpcClient<ContentRate.Protos.RoomService.RoomServiceClient>(opt => opt.Address = new(url))
     .ConfigureChannel(c => c.HttpHandler = new GrpcWebHandler(new HttpClientHandler()));
 builder.Services.AddGrpcClient<ContentRate.Protos.AuthService.AuthServiceClient>(opt => opt.Address = new(url))
@@ -32,4 +40,5 @@ builder.Services.AddScoped<IAuthService, AuthClientGrpcService>();
 builder.Services.AddTransient<RoomListViewModel>();
 builder.Services.AddTransient<RoomEditViewModel>();
 builder.Services.AddHttpClient<YoutubeContentImporter>();
+builder.Services.AddScoped<ITokenProvider, JwtProvider>();
 await builder.Build().RunAsync();

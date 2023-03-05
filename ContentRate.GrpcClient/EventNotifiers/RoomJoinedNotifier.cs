@@ -3,9 +3,9 @@ using ContentRate.Application.Events;
 
 namespace ContentRate.GrpcClient.EventNotifiers
 {
-    internal class RoomJoinedNotifier : EventNotifier<UserTitle>
+    internal class RoomJoinedListener : EventNotifier<UserTitle>
     {
-        public RoomJoinedNotifier(ContentRateEventHandler<UserTitle> handler) : base(handler)
+        public RoomJoinedListener(ContentRateEventHandler<UserTitle> handler) : base(handler)
         {
         }
     }

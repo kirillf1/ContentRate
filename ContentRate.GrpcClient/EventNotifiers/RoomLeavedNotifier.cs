@@ -3,9 +3,9 @@ using ContentRate.Application.Events;
 
 namespace ContentRate.GrpcClient.EventNotifiers
 {
-    internal class RoomLeavedNotifier : EventNotifier<RoomExit>
+    internal class RoomLeavedListener : EventNotifier<RoomExit>
     {
-        public RoomLeavedNotifier(ContentRateEventHandler<RoomExit> handler) : base(handler)
+        public RoomLeavedListener(ContentRateEventHandler<RoomExit> handler) : base(handler)
         {
         }
     }

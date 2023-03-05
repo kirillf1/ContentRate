@@ -2,6 +2,8 @@
 using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
+using Grpc.Core;
+using System.Reflection.PortableExecutable;
 using AuthService = ContentRate.Protos.AuthService;
 
 namespace ContentRate.GrpcClient.Users
@@ -9,9 +11,12 @@ namespace ContentRate.GrpcClient.Users
     public class AuthClientGrpcService : IAuthService
     {
         private readonly AuthService.AuthServiceClient client;
-        public AuthClientGrpcService(AuthService.AuthServiceClient client)
+        private readonly ITokenProvider tokenProvider;
+
+        public AuthClientGrpcService(AuthService.AuthServiceClient client,ITokenProvider tokenProvider)
         {
             this.client = client;
+            this.tokenProvider = tokenProvider;
         }
         public async Task<Result<bool>> HasUser(string name)
         {
@@ -48,11 +53,15 @@ namespace ContentRate.GrpcClient.Users
         {
             try
             {
-                var userTitleGrpc = await client.RegisterAsync(new Protos.RegisterMessageGrpc
+                var call = client.RegisterAsync(new Protos.RegisterMessageGrpc
                 {
                     Name = registerModel.Name,
                     Password = registerModel.Password,
                 });
+                Metadata headers = await call.ResponseHeadersAsync;
+                var authToken = headers.GetValue("Authorization");
+                var userTitleGrpc = await call.ResponseAsync;
+                await tokenProvider.RefreshToken(authToken!);
                 return UserConverter.ConvertGrpcToUserTitle(userTitleGrpc);
             }
             catch (Exception ex)

@@ -28,6 +28,8 @@ namespace ContentRate.GrpcService.GrpcServices.Rooms
 
         public override async Task GetRoomTitles(Empty request, IServerStreamWriter<RoomTitleGrpc> responseStream, ServerCallContext context)
         {
+            var cont = context.GetHttpContext();
+            var user = context.GetHttpContext().User;
             var result = await queryService.GetRoomTitles();
             if (!result.IsSuccess)
                 throw new RpcException(new Status(StatusCode.Unknown, $"Errors: {string.Join(',', result.Errors)}"));

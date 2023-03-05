@@ -3,11 +3,11 @@ using System.Text.Json;
 
 namespace ContentRate.GrpcClient.EventNotifiers
 {
-    internal interface IEventNotifierBase
+    internal interface IEventListenerBase
     {
         bool TryNotify(Protos.RoomEstimateEventGrpc eventGrpc);
     }
-    internal abstract class EventNotifier<TParam> : IEventNotifierBase
+    internal abstract class EventNotifier<TParam> : IEventListenerBase
     {
         protected readonly ContentRateEventHandler<TParam> handler;
 

@@ -9,25 +9,25 @@ using Grpc.Core;
 
 namespace ContentRate.GrpcClient.Rooms
 {
-    public class RoomEstimationEventGrpcNotifier : IRoomEstimationEventNotifier
+    public class RoomEstimationEventGrpcListener : IRoomEstimationEventListener
     {
-        private readonly Dictionary<EventType, Func<IEventNotifierBase>> eventNotifiers;
+        private readonly Dictionary<EventType, Func<IEventListenerBase>> eventListener;
 
         public event ContentRateEventHandler<ContentEstimate> ContentEstimated;
         public event ContentRateEventHandler<RoomExit> AssessorLeaved;
         public event ContentRateEventHandler<UserTitle> AssessorJoined;
         private readonly RoomEstimateEventService.RoomEstimateEventServiceClient client;
         CancellationTokenSource tokenSource;
-        public RoomEstimationEventGrpcNotifier(RoomEstimateEventService.RoomEstimateEventServiceClient client)
+        public RoomEstimationEventGrpcListener(RoomEstimateEventService.RoomEstimateEventServiceClient client)
         {
             this.client = client;
             tokenSource = new CancellationTokenSource();
 
-            eventNotifiers = new Dictionary<EventType, Func<IEventNotifierBase>>
+            eventListener = new Dictionary<EventType, Func<IEventListenerBase>>
         {
-            {EventType.AssessorLeaved, ()=> new RoomLeavedNotifier(AssessorLeaved)},
-            {EventType.AssessorJoined, ()=> new RoomJoinedNotifier(AssessorJoined)},
-            {EventType.ContentEstimated,()=> new ContentEstimatedNotifier(ContentEstimated)},
+            {EventType.AssessorLeaved, ()=> new RoomLeavedListener(AssessorLeaved)},
+            {EventType.AssessorJoined, ()=> new RoomJoinedListener(AssessorJoined)},
+            {EventType.ContentEstimated,()=> new ContentEstimatedListener(ContentEstimated)},
             // добавить EstimationEnd
         };
         }
@@ -51,7 +51,7 @@ namespace ContentRate.GrpcClient.Rooms
             {
                 await foreach (var _event in listner.ResponseStream.ReadAllAsync(tokenSource.Token))
                 {
-                    var isNotified = eventNotifiers[_event.EventType]
+                    var isNotified = eventListener[_event.EventType]
                         .Invoke()
                         .TryNotify(_event);
                 }

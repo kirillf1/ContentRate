@@ -30,7 +30,7 @@ namespace ContentRate.UnitTests.GrpcIntergrationTests
             IRoomService roomServiceSecond = new RoomClientGrpcService(new GrpcClient.ContentRate.Protos.RoomService.RoomServiceClient(secondChannel));
             IRoomEstimationService estimationClient = new RoomEstimationClientGrpcService(new GrpcClient.ContentRate.Protos.RoomEstimateService.RoomEstimateServiceClient(firstChannel));
             
-            var notifier = new RoomEstimationEventGrpcNotifier(new GrpcClient.ContentRate.Protos.RoomEstimateEventService.RoomEstimateEventServiceClient(firstChannel));
+            var notifier = new RoomEstimationEventGrpcListener(new GrpcClient.ContentRate.Protos.RoomEstimateEventService.RoomEstimateEventServiceClient(firstChannel));
             var result = await roomServiceFirst.JoinRoom(new RoomEnter { AssessorId = userFirst.Id, RoomId = room.Id });
             notifier.AssessorJoined += AssessorJoined;
             var notifierTask = notifier.StartListenEvents(userFirst.Id, room.Id);
@@ -61,7 +61,7 @@ namespace ContentRate.UnitTests.GrpcIntergrationTests
             IRoomEstimationService estimationClientFirst = new RoomEstimationClientGrpcService(new GrpcClient.ContentRate.Protos.RoomEstimateService.RoomEstimateServiceClient(firstChannel));
             IRoomEstimationService estimationClientSecond = new RoomEstimationClientGrpcService(new GrpcClient.ContentRate.Protos.RoomEstimateService.RoomEstimateServiceClient(secondChannel));
            
-            var notifier = new RoomEstimationEventGrpcNotifier(new  GrpcClient.ContentRate.Protos.RoomEstimateEventService.RoomEstimateEventServiceClient(secondChannel));
+            var notifier = new RoomEstimationEventGrpcListener(new  GrpcClient.ContentRate.Protos.RoomEstimateEventService.RoomEstimateEventServiceClient(secondChannel));
             var resultRoom = await roomServiceFirst.JoinRoom(new RoomEnter { AssessorId = userFirst.Id, RoomId = room.Id });
             notifier.ContentEstimated += ContentEstimated;
             var notifierTask = notifier.StartListenEvents(userFirst.Id, room.Id);

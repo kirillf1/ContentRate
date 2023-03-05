@@ -5,7 +5,7 @@ using ContentRate.Application.Events;
 
 namespace ContentRate.Application.Rooms
 {
-    public interface IRoomEstimationEventNotifier
+    public interface IRoomEstimationEventListener
     {
         public Task StartListenEvents(Guid assessorId, Guid roomId);
         public Task StopListenEvents();

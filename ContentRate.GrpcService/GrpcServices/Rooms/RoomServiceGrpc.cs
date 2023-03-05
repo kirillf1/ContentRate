@@ -71,6 +71,8 @@ namespace ContentRate.GrpcService.GrpcServices.Rooms
         public override async Task<RoomUpdateGrpc> OpenRoomToUpdate(RoomIdGrpc request, ServerCallContext context)
         {
             var result = await roomService.OpenRoomToUpdate(Guid.Parse(request.Id));
+            if (!result.IsSuccess)
+                throw new RpcException(new Status(StatusCode.Unknown, $"Errors: {string.Join(',', result.Errors)}"));
             return RoomConverter.CreateRoomUpdateGrpc(result);
         }
         
