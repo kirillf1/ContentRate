@@ -3,7 +3,6 @@ using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
 using Grpc.Core;
-using ContentRate.Protos;
 using UserQueryService = ContentRate.Protos.UserQueryService;
 
 namespace ContentRate.GrpcClient.Users

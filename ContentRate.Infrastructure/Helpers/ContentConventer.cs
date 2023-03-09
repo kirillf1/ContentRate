@@ -31,7 +31,7 @@ namespace ContentRate.Infrastructure.Helpers
         private static void UpdateRating(Content contentUpdate, ContentModel contentModel)
         {
             foreach (var ratingForDelete in contentModel.Ratings.Where(r => !contentUpdate.Ratings.Any(
-                                c => c.AssessorId == r.UserId)))
+                                c => c.AssessorId == r.UserId)).ToList())
             {
                 contentModel.Ratings.Remove(ratingForDelete);
             }

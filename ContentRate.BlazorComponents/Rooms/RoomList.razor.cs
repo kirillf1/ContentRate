@@ -1,4 +1,6 @@
-﻿using ContentRate.ViewModels.Rooms;
+﻿using ContentRate.Application.Contracts.Users;
+using ContentRate.Application.Users;
+using ContentRate.ViewModels.Rooms;
 using Microsoft.AspNetCore.Components;
 using ReactiveUI;
 using System.Reactive.Disposables;
@@ -6,7 +8,9 @@ using System.Reactive.Disposables;
 namespace ContentRate.BlazorComponents.Rooms
 {
     public partial class RoomList
-    {      
+    {
+        [Inject]
+        IUserContext UserContext { get; set; } = default!;
         [Inject]
         public RoomListViewModel RoomViewModel
         {
@@ -23,6 +27,8 @@ namespace ContentRate.BlazorComponents.Rooms
                 StateHasChanged();
             }
         }
+        // если будет много логики проверки то можно создать отдельный сервис, а не подгружать пользователя
+        private UserTitle? userTitle;
         private bool canSearch;
         public RoomList()
         {
@@ -32,14 +38,20 @@ namespace ContentRate.BlazorComponents.Rooms
                         viewModel => viewModel.IsBusy,
                         view => view.CanSearch)
                     .DisposeWith(disposableRegistration);
-                
             });
           
         }
         protected override async Task OnInitializedAsync()
         {
-            await ViewModel!.LoadRooms();
+            await RoomViewModel.LoadRooms();
+            userTitle = await UserContext.TryGetCurrentUser();
             await base.OnInitializedAsync();
+        }
+        private bool CanEditRoom(Guid creatorId)
+        {
+            if (userTitle is null)
+                return false;
+            return userTitle.Id == creatorId;
         }
     }
 }

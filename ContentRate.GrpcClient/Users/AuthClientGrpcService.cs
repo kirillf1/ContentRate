@@ -2,8 +2,8 @@
 using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
+using ContentRate.Protos;
 using Grpc.Core;
-using System.Reflection.PortableExecutable;
 using AuthService = ContentRate.Protos.AuthService;
 
 namespace ContentRate.GrpcClient.Users
@@ -23,7 +23,6 @@ namespace ContentRate.GrpcClient.Users
             try
             {
                 var isUniqueUser = await client.HasUserAsync(new Protos.UserCheckGrpc { Name = name });
-                Console.WriteLine("check");
                 return isUniqueUser.Result;
             }
             catch (Exception ex)
@@ -36,11 +35,12 @@ namespace ContentRate.GrpcClient.Users
         {
             try
             {
-                var userTitleGrpc = await client.LoginAsync(new Protos.LoginMessageGrpc
+                var call = client.LoginAsync(new Protos.LoginMessageGrpc
                 {
                     Name = loginModel.Name,
                     Password = loginModel.Password,
                 });
+                var userTitleGrpc = await SetAuthorizationToken(call);
                 return UserConverter.ConvertGrpcToUserTitle(userTitleGrpc);
             }
             catch(Exception ex)
@@ -58,16 +58,22 @@ namespace ContentRate.GrpcClient.Users
                     Name = registerModel.Name,
                     Password = registerModel.Password,
                 });
-                Metadata headers = await call.ResponseHeadersAsync;
-                var authToken = headers.GetValue("Authorization");
-                var userTitleGrpc = await call.ResponseAsync;
-                await tokenProvider.RefreshToken(authToken!);
+                UserTitleGrpc userTitleGrpc = await SetAuthorizationToken(call);
                 return UserConverter.ConvertGrpcToUserTitle(userTitleGrpc);
             }
             catch (Exception ex)
             {
                 return Result.Error(ex.Message);
             }
+        }
+
+        private async Task<UserTitleGrpc> SetAuthorizationToken(AsyncUnaryCall<UserTitleGrpc> call)
+        {
+            Metadata headers = await call.ResponseHeadersAsync;
+            var authToken = headers.GetValue("Authorization");
+            var userTitleGrpc = await call.ResponseAsync;
+            await tokenProvider.RefreshToken(authToken!);
+            return userTitleGrpc;
         }
     }
 }

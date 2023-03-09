@@ -4,11 +4,14 @@
 @page "/roomeditor"
 @page "/roomeditor/{id:guid}"
 <MudGrid Class="mt-3" Justify="Justify.SpaceBetween">
-    <MudItem xs="6" Class="d-flex justify-start">
+    <MudItem xs="4" Class="d-flex justify-start">
         <MudText Class="align-self-center" Typo="Typo.h5">@Title</MudText>
     </MudItem>
-    <MudItem xs="6" Class="d-flex justify-end">
+    <MudItem xs="4" Class="d-flex justify-end">
         <MudButton Command="EditViewModel.SaveRoomCommand" Class="justify align-self-center" Variant="Variant.Filled" Color="Color.Primary">Сохранить комнату</MudButton>
+    </MudItem>
+    <MudItem xs="4" Class="d-flex justify-end">
+        <MudButton OnClick="RemoveRoom" Class="justify align-self-center" Variant="Variant.Filled" Color="Color.Error">Удалить комнату</MudButton>
     </MudItem>
 </MudGrid>
 @if (EditViewModel is null)
@@ -34,7 +37,6 @@ else
                     <MudSwitch Color="Color.Primary" @bind-Checked="EditViewModel.IsPrivate" LabelPosition="LabelPosition.Start" Label="Приватная комната" />
                 </MudItem>
             </MudGrid>
-
         </MudTabPanel>
         <!-- #endregion -->
         <!-- #region Блок пользователей -->

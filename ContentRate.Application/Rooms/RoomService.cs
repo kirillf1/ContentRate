@@ -22,6 +22,15 @@ namespace ContentRate.Application.Rooms
             try
             {
                 Room room = ConvertRoomUpdateToRoom(roomCreate);
+                // оффлайн пользователей по-началу не существует, надо их добавить
+                foreach (var newAssessor in room.Assessors.Where(c=>c.IsMockAssessor))
+                {
+                    await userRepository.AddUser(new User(newAssessor.Id, newAssessor.Name, Guid.NewGuid().ToString())
+                    {
+                        IsMockUser = true
+                    });
+                }
+                await userRepository.SaveChanges();
                 await roomRepository.AddRoom(room);
                 await roomRepository.SaveChanges();
                 return Result.Success();
@@ -36,6 +45,7 @@ namespace ContentRate.Application.Rooms
             try
             {
                 await roomRepository.DeleteRoom(roomId);
+                await roomRepository.SaveChanges();
                 return Result.Success();
             }
             catch (Exception ex)
@@ -76,7 +86,8 @@ namespace ContentRate.Application.Rooms
                 room.RoomDetails.IsPrivate = roomUpdate.IsPrivate;
 
                 var assessorForUpdate = GetAssessorFromRoomUpdate(roomUpdate).ToList();
-                var assessorForDelete = room.Assessors.Where(a => !assessorForUpdate.Any(c => c.Id == a.Id));
+                var assessorForDelete = room.Assessors
+                    .Where(a => !assessorForUpdate.Any(c => c.Id == a.Id)).ToList();
                 foreach (var assessor in assessorForDelete) 
                 {
                     room.AssessorLeave(assessor.Id);
@@ -84,13 +95,14 @@ namespace ContentRate.Application.Rooms
                         await userRepository.DeleteUser(assessor.Id);
                 }
                     
-                var assessorForAdd = assessorForUpdate.Where(a => !room.Assessors.Any(c => a.Id == c.Id));
+                var assessorForAdd = assessorForUpdate
+                    .Where(a => !room.Assessors.Any(c => a.Id == c.Id)).ToList();
                 // тут надо учесть, что возможно стоит добавить событие для пользователей, т.к. изменения
                 // могут происходить когда люди уже оценивают
                 foreach (var assessor in assessorForAdd)
                 {
                     if (assessor.IsMockAssessor)
-                        await userRepository.AddUser(new User(assessor.Id, assessor.Name, Guid.NewGuid().ToString()));
+                        await userRepository.AddUser(new User(assessor.Id, assessor.Name, Guid.NewGuid().ToString()) { IsMockUser = true});
                     room.AssessorJoin(assessor);
                 }
                 await userRepository.SaveChanges();

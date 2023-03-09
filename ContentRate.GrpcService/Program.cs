@@ -26,7 +26,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddDbContext<ContentRateDbContext>(c =>
 c.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 
-builder.Services.AddScoped<IRoomRepository, RoomGenerator>();
+builder.Services.AddScoped<IRoomRepository, RoomRepositoryEf>();
 builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
 builder.Services.AddScoped<IContentRepository, ContentRepositoryEf>();
 builder.Services.AddScoped<IRoomService, RoomService>();

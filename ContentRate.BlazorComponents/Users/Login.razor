@@ -1,0 +1,56 @@
+﻿@inherits ReactiveComponentBase<LoginViewModel>
+@page "/login"
+@using ContentRate.BlazorComponents.Dialogs;
+@using ContentRate.BlazorComponents.States;
+@using ContentRate.ViewModels.Users;
+@using System.Reactive.Threading.Tasks;
+<div class="mt-5 d-flex justify-content-center">
+    <MudPaper Class="pa-4 form-width">
+        <MudText Typo="Typo.h6">Войти</MudText>
+        <MudForm Model="LoginViewModel" @bind-IsValid="@success">
+            <MudTextField OnlyValidateIfDirty="true" @bind-Value="LoginViewModel.Name" T="string" Label="Имя пользователя"
+                          For="@(()=>LoginViewModel.Name)" Required="true" RequiredError="Введите логин" />
+            <MudTextField @bind-Value="LoginViewModel.Password" T="string" Label="Пароль"
+                          HelperText="Введите пароль" OnlyValidateIfDirty="true"
+                          InputType="InputType.Password" For="@(()=>LoginViewModel.Password)"
+                          Required="true" RequiredError="Пароль обязателен!" />
+            <div class="d-flex align-center justify-space-between mt-3">
+                <MudButton OnClick="@LoginUser" Variant="Variant.Filled" Disabled="@(!success)" Color="Color.Primary" Class="ml-auto">Войти</MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+</div>
+
+@code {
+    [Inject]
+    NavigationManager NavigationManager { get; set; } = default!;
+    [Inject]
+    IDialogService DialogService { get; set; } = default!;
+    [Inject]
+    private UserAuthState UserAuthState { get; set; } = default!;
+    [Inject]
+    private LoginViewModel LoginViewModel
+    {
+        get => ViewModel!;
+        set => ViewModel = value;
+    }
+    private bool success;
+    private async Task LoginUser()
+    {
+        var userTitle = await LoginViewModel.LoginCommand.Execute().ToTask();
+        if (userTitle is null)
+        {
+            ShowErrorLoginDialog();
+            return;
+        }
+        UserAuthState.SetNewUser(userTitle);
+        NavigationManager.NavigateTo("/roomlist");
+    }
+    private void ShowErrorLoginDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Введите правильный логин и пароль!");
+        parameters.Add("Color", Color.Warning);
+        DialogService.Show<NotifyResultDialog>("Неудачная попытка входа", parameters);
+    }
+}

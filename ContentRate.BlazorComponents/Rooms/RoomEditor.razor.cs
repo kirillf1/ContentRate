@@ -1,4 +1,5 @@
 ﻿using ContentRate.Application.ContentServices;
+using ContentRate.Application.Users;
 using ContentRate.Domain.Rooms;
 using ContentRate.ViewModels.Rooms;
 using DynamicData;
@@ -20,9 +21,12 @@ namespace ContentRate.BlazorComponents.Rooms
             {ContentType.Video, "Видео" },
             {ContentType.Image, "Фото" }
         };
+        [Inject]
+        NavigationManager NavigationManager { get; set; } = default!;
+        [Inject]
+        public IUserContext UserContext { get; set; } = default!;
         public RoomEditor()
         {
-
             this.WhenActivated(disposableRegistration =>
             {
                 this.EditViewModel.Content.ToObservableChangeSet()
@@ -55,7 +59,10 @@ namespace ContentRate.BlazorComponents.Rooms
         {
             if (Id is null)
             {
-                EditViewModel.CreateNewRoom(Guid.NewGuid());
+                var user = await UserContext.TryGetCurrentUser();
+                if (user is null)
+                    throw new Exception("No user");
+                EditViewModel.CreateNewRoom(user);
                 return;
             }
             await EditViewModel.LoadRoom(Id.Value);
@@ -78,6 +85,12 @@ namespace ContentRate.BlazorComponents.Rooms
         private async Task ImportContent(IContentImporter contentImporter)
         {
             await EditViewModel.ImportContentCommand.Execute(contentImporter).ToTask();
+        }
+        private async Task RemoveRoom()
+        {
+           var isDeleted = await EditViewModel.RemoveRoomCommand.Execute().ToTask();
+            if (isDeleted)
+                NavigationManager.NavigateTo("/roomList");
         }
     }
 }

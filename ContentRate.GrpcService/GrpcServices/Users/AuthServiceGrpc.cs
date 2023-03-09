@@ -1,4 +1,6 @@
-﻿using ContentRate.Application.Users;
+﻿using Ardalis.Result;
+using ContentRate.Application.Contracts.Users;
+using ContentRate.Application.Users;
 using ContentRate.GrpcExtensions.Helpers;
 using ContentRate.GrpcService.Authorization;
 using ContentRate.Protos;
@@ -34,6 +36,7 @@ namespace ContentRate.GrpcService.GrpcServices.Users
             });
             if (!result.IsSuccess)
                 throw new RpcException(new Status(StatusCode.Unknown, $"Errors: {string.Join(',', result.Errors)}"));
+            await SetAuthorizationToken(context,result.Value);
             return UserConverter.ConvertToUserTitleGrpc(result.Value);
         }
         public override async Task<UserTitleGrpc> Register(RegisterMessageGrpc request, ServerCallContext context)
@@ -45,9 +48,14 @@ namespace ContentRate.GrpcService.GrpcServices.Users
             });
             if (!result.IsSuccess)
                 throw new RpcException(new Status(StatusCode.Unknown, $"Errors: {string.Join(',', result.Errors)}"));
+            await SetAuthorizationToken(context, result);
+            return UserConverter.ConvertToUserTitleGrpc(result.Value);
+        }
+
+        private async Task SetAuthorizationToken(ServerCallContext context, Result<UserTitle> result)
+        {
             var token = await tokenGenerator.GenerateToken(result.Value);
             await context.WriteResponseHeadersAsync(new Metadata() { { "Authorization", token } });
-            return UserConverter.ConvertToUserTitleGrpc(result.Value);
         }
     }
 }

@@ -92,3 +92,8 @@ a, .btn-link {
         width: 50%;
     }
 }
+@media (min-width:1400px) {
+    .form-width {
+        width: 30%;
+    }
+}

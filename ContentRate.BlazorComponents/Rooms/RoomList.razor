@@ -3,8 +3,6 @@
 @page "/roomlist"
 @inherits ReactiveComponentBase<RoomListViewModel>
 
-
-
 <MudGrid Class="mt-3" Justify="Justify.SpaceBetween">
     <MudItem Class="d-flex">
         <MudText Class="align-self-center" Typo="Typo.h5">Список комнат</MudText>
@@ -35,7 +33,9 @@ else
                             <MudText Typo="Typo.h6">@roomTitle.Name</MudText>
                         </CardHeaderContent>
                         <CardHeaderActions>
-                            <MudIconButton Href=@string.Concat("/roomeditor/",roomTitle.Id) Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
+                            <MudIconButton Class="@(CanEditRoom(roomTitle.Creator.Id) ? "visible" : "invisible")"
+                                Href=@string.Concat("/roomeditor/",roomTitle.Id) 
+                                Icon="@Icons.Material.Filled.Edit" Color="Color.Default" />
                         </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent>

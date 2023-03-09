@@ -1,74 +1,75 @@
 ﻿@using System.Text.RegularExpressions;
 @using ContentRate.Application.Contracts.Users;
 @using ContentRate.Application.Users;
+@using ContentRate.BlazorComponents.Dialogs;
+@using ContentRate.BlazorComponents.States;
+@using ContentRate.ViewModels.Users;
+@using FluentValidation;
+@using System.Reactive.Threading.Tasks;
+@inherits ReactiveComponentBase<RegisterViewModel>
 @page "/register"
 <div class="mt-5 d-flex justify-content-center">
     <MudPaper Class="pa-4 form-width">
         <MudText Typo="Typo.h6">Регистрация</MudText>
-        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-            <MudTextField OnlyValidateIfDirty="true" @bind-Value="registerModel.Name" T="string" Label="Имя пользователя"
-                          Required="true" RequiredError="Имя обязательно!"
-                          Validation="@(new Func<string, Task<string>>(NameValidation))" />
-            <MudTextField @bind-Value="registerModel.Password" T="string" Label="Password"
-                          HelperText="Введите пароль" @ref="passwordField" OnlyValidateIfDirty="true"
-                          InputType="InputType.Password"
-                          Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
-                          RequiredError="Пароль обязателен!" />
-            <MudTextField T="string" OnlyValidateIfDirty="true"
-                          Label="Password" HelperText="Повторите пароль" InputType="InputType.Password"
-                          Validation="@(new Func<string, string>(PasswordMatch))" />
-
-            <div class="d-flex align-center justify-space-between">
-                <MudButton OnClick="@RegisterUser" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Зарегистрироваться</MudButton>
+        <MudForm Model="RegisterViewModel" Validation="@(ValidateValue)" @ref="form"
+                 @bind-IsValid="@success">
+            <MudTextField OnlyValidateIfDirty="true" @bind-Value="RegisterViewModel.Name" T="string" Label="Имя пользователя"
+                          For="@(()=>RegisterViewModel.Name)" />
+            <MudTextField @bind-Value="RegisterViewModel.Password" T="string" Label="Пароль"
+                          HelperText="Введите пароль" OnlyValidateIfDirty="true"
+                          InputType="InputType.Password" For="@(()=>RegisterViewModel.Password)"
+                          Required="true" RequiredError="Пароль обязателен!" />
+            <MudTextField @bind-Value="RegisterViewModel.ConfirmPassword" T="string" OnlyValidateIfDirty="true"
+                          Label="Повторите пароль" InputType="InputType.Password"
+                          For="@(()=>RegisterViewModel.ConfirmPassword)" />
+            <div class="d-flex align-center justify-space-between mt-3">
+                <MudButton OnClick="@RegisterUser" Variant="Variant.Filled" Disabled="@(!success)" Color="Color.Primary" Class="ml-auto">Зарегистрироваться</MudButton>
             </div>
         </MudForm>
     </MudPaper>
 </div>
 @code {
-    // перенести логику в ViewModel
-    private RegisterModel registerModel = new() { Name = "", Password = "" };
     [Inject]
-    public IAuthService AuthService { get; set; }
+    IDialogService DialogService { get; set; } = default!;
+    [Inject]
+    private RegisterViewModel RegisterViewModel
+    {
+        get => ViewModel!;
+        set => ViewModel = value;
+    }
+    [Inject]
+    private UserAuthState UserAuthState { get; set; } = default!;
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
     private bool success;
-    private string[] errors = { };
-    private MudTextField<string> passwordField;
     private MudForm form;
-
-    private IEnumerable<string> PasswordStrength(string pw)
-    {
-        if (string.IsNullOrWhiteSpace(pw))
-        {
-            yield return "Пароль обязателен!";
-            yield break;
-        }
-        if (pw.Length < 5)
-            yield return "Длина пароля должна быть больше 5";
-    }
-
-    private string PasswordMatch(string arg)
-    {
-        if (passwordField.Value != arg)
-            return "Пароли не совпадают";
-        return null;
-    }
-    private async Task<string> NameValidation(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            return "Имя обязательно!";
-        }
-        var hasUserResult = await AuthService.HasUser(name);
-        if (!hasUserResult.IsSuccess || !hasUserResult.Value)
-        {
-            return "Пользователь с таким именем уже есть";
-        }
-        return null;
-    }
     private async Task RegisterUser()
     {
         await form.Validate();
         if (!form.IsValid)
             return;
-        await AuthService.Register(registerModel);
+        var userModel = await RegisterViewModel.RegisterCommand.Execute().ToTask();
+        if (userModel is null)
+        {
+            ShowErrorRegisterDialog();
+            return;
+        }
+        UserAuthState.SetNewUser(userModel);
+        NavigationManager.NavigateTo("/roomList");
+    }
+    private Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+    {
+        var result = await RegisterViewModel.Validator.ValidateAsync(ValidationContext<RegisterViewModel>
+            .CreateWithOptions((RegisterViewModel)model, x => x.IncludeProperties(propertyName)));
+        if (result.IsValid)
+            return Array.Empty<string>();
+        return result.Errors.Select(e => e.ErrorMessage);
+    };
+    private void ShowErrorRegisterDialog()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("ContentText", "Произошла ошибка неизвестная ошибка");
+        parameters.Add("Color", Color.Warning);
+        DialogService.Show<NotifyResultDialog>("Попробуйте ввести другое имя или попробуйте позже");
     }
 }

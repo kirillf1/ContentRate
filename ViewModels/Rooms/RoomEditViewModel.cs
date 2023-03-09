@@ -2,6 +2,7 @@
 using ContentRate.Application.ContentServices;
 using ContentRate.Application.Contracts.Content;
 using ContentRate.Application.Contracts.Rooms;
+using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Rooms;
 using ContentRate.Domain.Rooms;
 using ContentRate.ViewModels.Content;
@@ -29,6 +30,7 @@ namespace ContentRate.ViewModels.Rooms
             AddContentCommand = ReactiveCommand.Create(CreateNewContent);
             RemoveContentCommand = ReactiveCommand.Create<Guid>(RemoveContent);
             ImportContentCommand = ReactiveCommand.CreateFromTask<IContentImporter>(ImportContent);
+            RemoveRoomCommand = ReactiveCommand.CreateFromTask(RemoveRoom);
             room = new RoomUpdate() { Id = Guid.NewGuid(), Name = "" };
         }
         private RoomUpdate room;
@@ -39,6 +41,7 @@ namespace ContentRate.ViewModels.Rooms
         public ReactiveCommand<Unit, Unit> AddAssessorCommand { get; }
         public ReactiveCommand<IContentImporter, Unit> ImportContentCommand { get; }
         public ReactiveCommand<Guid, Unit> RemoveAssessorCommand { get; }
+        public ReactiveCommand<Unit,bool> RemoveRoomCommand { get; }
         public ReactiveCommand<Guid, Unit> RemoveContentCommand { get; }
         public string? Password
         {
@@ -77,9 +80,21 @@ namespace ContentRate.ViewModels.Rooms
             InitViewModel(roomResult.Value);
             isNewRoom = false;
         }
-        public void CreateNewRoom(Guid creatorId)
+        public void CreateNewRoom(UserTitle userTitle)
         {
-            InitViewModel(new RoomUpdate() { Id = creatorId, Name = "" });
+            var room = new RoomUpdate()
+            {
+                Id = Guid.NewGuid(),
+                CreatorId = userTitle.Id,
+                Name = ""
+            };
+            room.Assessors.Add(new AssessorTitle
+            {
+                Id = userTitle.Id,
+                IsMock = false,
+                Name = userTitle.Name
+            });
+            InitViewModel(room);
             isNewRoom = true;
         }
         private void InitViewModel(RoomUpdate roomUpdate)
@@ -161,6 +176,14 @@ namespace ContentRate.ViewModels.Rooms
             var assessorDelete = room.Assessors.Find(c => c.Id == assessorId);
             if (assessorDelete is not null)
                 room.Assessors.Remove(assessorDelete);
+        }
+        private async Task<bool> RemoveRoom()
+        {
+            var roomId = room.Id;
+            var deleteResult = await roomService.DeleteRoom(roomId);
+            if (!deleteResult.IsSuccess)
+                throw new Exception(deleteResult.Errors.First());
+            return true;
         }
         #endregion
     }

@@ -10,7 +10,8 @@
                        Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         Оценка контента
         <MudSpacer />
-        <MudIconButton Href="/register" Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" />
+        <ContentRate.BlazorComponents.Users.UserMenu/>
+        @*<MudIconButton Href="/register" Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" />*@
     </MudAppBar>
     <MudDrawer ClipMode="DrawerClipMode.Always" @bind-Open="@_drawerOpen">
         <NavMenu />
@@ -21,9 +22,10 @@
         </MudContainer>
     </MudMainContent>
     <MudScrollToTop>
-        <MudFab Color="Color.Tertiary" Icon="@Icons.Material.Filled.ArrowUpward" />
+        <MudFab Color="Color.Tertiary" StartIcon="@Icons.Material.Filled.ArrowUpward" />
     </MudScrollToTop>
 </MudLayout>
+
 @code {
     bool _drawerOpen = true;
 

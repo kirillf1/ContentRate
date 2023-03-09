@@ -28,11 +28,11 @@ namespace ContentRate.GrpcService.GrpcServices.Rooms
 
         public override async Task GetRoomTitles(Empty request, IServerStreamWriter<RoomTitleGrpc> responseStream, ServerCallContext context)
         {
-            var cont = context.GetHttpContext();
-            var user = context.GetHttpContext().User;
             var result = await queryService.GetRoomTitles();
-            if (!result.IsSuccess)
+            if (result.Status == Ardalis.Result.ResultStatus.Error)
                 throw new RpcException(new Status(StatusCode.Unknown, $"Errors: {string.Join(',', result.Errors)}"));
+            if (result.Status == Ardalis.Result.ResultStatus.NotFound)
+                return;
             foreach (var roomTitle in result.Value)
             {
                 RoomTitleGrpc roomTitleGrpc = RoomConverter.ConvertRoomTitleToGrpc(roomTitle);

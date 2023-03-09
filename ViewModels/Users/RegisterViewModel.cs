@@ -1,18 +1,15 @@
 ﻿using ContentRate.Application.Contracts.Users;
 using ContentRate.Application.Users;
+using ContentRate.ViewModels.Validators;
+using FluentValidation;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using ReactiveUI.Validation.Abstractions;
-using ReactiveUI.Validation.Contexts;
-using ReactiveUI.Validation.Extensions;
+using System.Reactive;
 
 namespace ContentRate.ViewModels.Users
 {
-    public class RegisterViewModel : ViewModelBase, IValidatableViewModel
+    public class RegisterViewModel : ViewModelBase
     {
-        private readonly IAuthService authService;
-        private RegisterModel registerModel;
-        public ValidationContext ValidationContext { get; } = new ValidationContext();
         public RegisterViewModel(IAuthService authService)
         {
             this.authService = authService;
@@ -22,20 +19,13 @@ namespace ContentRate.ViewModels.Users
                 Password = "",
             };
             ConfirmPassword = "";
-            IObservable<bool> passwordsObservable =
-                this.WhenAnyValue(
-                      x => x.Password,
-                      x => x.ConfirmPassword,
-                      (password, confirmation) => password == confirmation);
-
-            this.ValidationRule(vm => vm.ConfirmPassword,
-                passwordsObservable,
-                "Пароли должны совпадать.");
-
-            this.ValidationRule(viewModel => viewModel.Name,
-                  name => !string.IsNullOrWhiteSpace(name),
-                  "Имя не должно быть пустым");
+            Validator = new RegisterValidator(authService);
+            RegisterCommand = ReactiveCommand.CreateFromTask(TryRegister);
         }
+        private readonly IAuthService authService;
+        private RegisterModel registerModel;
+        public ReactiveCommand<Unit, UserTitle?> RegisterCommand { get; }
+        public AbstractValidator<RegisterViewModel> Validator { get; }
         public string Password
         {
             get => registerModel.Password;
@@ -56,6 +46,17 @@ namespace ContentRate.ViewModels.Users
                 registerModel.Name = value;
                 this.RaisePropertyChanged();
             }
+        }
+        private async Task<UserTitle?> TryRegister()
+        {
+            var validateResult = await Validator.ValidateAsync(this);
+            if (!validateResult.IsValid)
+                return null;
+            var registerResult = await authService.Register(registerModel);
+            if (registerResult.IsSuccess)
+                return registerResult.Value;
+            return null;
+
         }
     }
 }

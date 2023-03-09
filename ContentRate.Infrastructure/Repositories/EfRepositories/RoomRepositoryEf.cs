@@ -22,7 +22,7 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
 
         private async Task<RoomModel> CreateModelFromRoom(Room room)
         {
-            return new RoomModel
+            var roomModel = new RoomModel
             {
                 ContentList = room.ContentList.Select(c => ContentConventer.ConvertContentToModel(c, room.Id)).ToList(),
                 Id = room.Id,
@@ -37,8 +37,22 @@ namespace ContentRate.Infrastructure.Repositories.EfRepositories
                 Users = await context.Users.Where(c => room.Assessors
                 .Select(c => c.Id)
                 .Contains(c.Id))
-                .ToListAsync(),
+                .ToListAsync(),             
             };
+            //var newUsers = room.Assessors.Where(c => !roomModel.Users.Any(r => c.Id == r.Id));
+            //foreach (var newUser in newUsers)
+            //{
+            //    var user = new UserModel
+            //    {
+            //        Id = newUser.Id,
+            //        IsMockUser = newUser.IsMockAssessor,
+            //        Name = newUser.Name,
+            //        Password = Guid.NewGuid().ToString(),
+            //    };
+            //    context.Users.Add(user);
+            //    roomModel.Users.Add(user);
+            //}
+            return roomModel;
         }
 
         public async Task DeleteRoom(Guid id)

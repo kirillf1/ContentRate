@@ -1,0 +1,61 @@
+﻿@using ContentRate.Application.Contracts.Users;
+@using ContentRate.BlazorComponents.States;
+@implements IDisposable
+
+<MudMenu @ref="@menu">
+    <ActivatorContent>
+        <MudIcon Icon="@MenuIcon" />
+    </ActivatorContent>
+    <ChildContent>
+        @if (userTitle is not null)
+        {
+            <MudContainer>
+                <MudText Typo="Typo.body1">
+                    Имя пользователя: @(userTitle.Name)
+                </MudText>
+            </MudContainer>
+            <MudMenuItem OnClick="()=>SignOut()" Icon="@Icons.Material.Filled.Logout">
+                Выйти
+            </MudMenuItem>
+        }
+        else
+        {
+            <MudMenuItem Href="/Login" Icon="@Icons.Material.Filled.Login">
+                Войти
+            </MudMenuItem>
+            <MudMenuItem Href="/Register" Icon="@Icons.Material.Filled.AppRegistration">
+                Зарегистрироваться
+            </MudMenuItem>
+        }
+    </ChildContent>
+</MudMenu>
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject]
+    private UserAuthState UserAuthState { get; set; } = default!;
+    MudMenu menu;
+    private UserTitle? userTitle;
+    public string MenuIcon => userTitle is null ? Icons.Material.Filled.NoAccounts : Icons.Material.Filled.AccountCircle;
+    protected async override Task OnInitializedAsync()
+    {
+        userTitle = await UserAuthState.GetCurrentUserTitle();
+        UserAuthState.OnUserChanged += UserChanged;
+    }
+
+    public void Dispose()
+    {
+        UserAuthState.OnUserChanged -= UserChanged;
+    }
+    private void UserChanged(UserTitle? user)
+    {
+        userTitle = user;
+        StateHasChanged();
+    }
+    private async Task SignOut()
+    {
+        await UserAuthState.SignOut();
+        NavigationManager.NavigateTo("/");
+    }
+}
